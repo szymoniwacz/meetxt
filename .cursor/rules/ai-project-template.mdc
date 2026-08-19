@@ -1,0 +1,10 @@
+---
+description: Load the private ai-project-template workflow materialized into .ai/
+alwaysApply: true
+---
+
+Follow `AGENTS.md`.
+
+If `.ai/README.md` is unavailable, run `./scripts/setup-ai-workflow.sh`. If private workflow access fails, stop and report the blocker.
+
+Treat `.ai/` as the runtime source of truth. Read `.ai/README.md` before making repository changes and follow the workflow documents it references.

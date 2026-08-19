@@ -1,0 +1,20 @@
+# Materialized private AI workflow. Project-owned overlay paths are re-enabled below.
+.ai/*
+!.ai/project/
+!.ai/project/**
+!.ai/docs/
+.ai/docs/*
+!.ai/docs/project-requirements.md
+!.ai/docs/architecture-direction.md
+!.ai/architecture/
+.ai/architecture/*
+!.ai/architecture/adr-*.md
+!.ai/stack-profiles/
+!.ai/stack-profiles/**
+!.ai/ideas/
+!.ai/ideas/**
+
+# Local environment and secrets.
+.env
+.env.*
+!.env.example
