@@ -1,18 +1,10 @@
-# Materialized private AI workflow. Project-owned overlay paths are re-enabled below.
+# Materialized private AI workflow. Existing tracked project overlay files remain tracked.
 .ai/*
 !.ai/project/
-!.ai/project/**
-!.ai/docs/
-.ai/docs/*
-!.ai/docs/project-requirements.md
-!.ai/docs/architecture-direction.md
-!.ai/architecture/
-.ai/architecture/*
-!.ai/architecture/adr-*.md
-!.ai/stack-profiles/
-!.ai/stack-profiles/**
-!.ai/ideas/
-!.ai/ideas/**
+.ai/project/*
+!.ai/project/decisions.md
+!.ai/project/product-context.md
+!.ai/project/roadmap.md
 
 # Materialized tool adapters from the private template.
 .agents/skills/
