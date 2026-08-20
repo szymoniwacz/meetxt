@@ -11,6 +11,9 @@
 !.ai/docs/
 .ai/docs/*
 !.ai/docs/project-requirements.md
+!.ai/stack-profiles/
+.ai/stack-profiles/*
+!.ai/stack-profiles/ruby-cli.md
 
 # Materialized tool adapters from the private template.
 .agents/skills/
