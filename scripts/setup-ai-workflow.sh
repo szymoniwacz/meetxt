@@ -20,12 +20,10 @@ if ! git -C "$ROOT" config -f .gitmodules --get-regexp '^submodule\.\.ai-templat
   exit 1
 fi
 
-if [[ ! -f "$TEMPLATE/.ai/README.md" ]]; then
-  if ! git -C "$ROOT" submodule update --init --recursive .ai-template; then
-    echo "error: private AI workflow is unavailable" >&2
-    echo "hint: ensure this environment can read szymoniwacz/ai-project-template" >&2
-    exit 1
-  fi
+if ! git -C "$ROOT" submodule update --init --remote --recursive .ai-template; then
+  echo "error: private AI workflow is unavailable" >&2
+  echo "hint: ensure this environment can read szymoniwacz/ai-project-template" >&2
+  exit 1
 fi
 
 required=(
@@ -34,6 +32,8 @@ required=(
   ".ai/automation/goal-executor.md"
   ".ai/instructions/workflow.md"
   ".ai/skills/execute-goal.md"
+  ".agents/skills/project-intake/SKILL.md"
+  ".cursor/commands/execute-goal.md"
 )
 for path in "${required[@]}"; do
   if [[ ! -f "$TEMPLATE/$path" ]]; then
@@ -55,6 +55,11 @@ done < <(git -C "$ROOT" ls-files -z -- .ai)
 
 mkdir -p "$AI"
 rsync -a --delete "$TEMPLATE/.ai/" "$AI/"
+
+for path in ".agents/skills" ".cursor/commands"; do
+  mkdir -p "$ROOT/$path"
+  rsync -a --delete "$TEMPLATE/$path/" "$ROOT/$path/"
+done
 
 if [[ -d "$OVERLAY/.ai" ]]; then
   rsync -a "$OVERLAY/.ai/" "$AI/"
