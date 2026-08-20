@@ -4,7 +4,7 @@ MeetXT is a planned local-first Ruby CLI for developers and technical profession
 
 ## Status
 
-Bootstrap documentation is prepared for review; product implementation has not started. The first product task will create the real Ruby CLI scaffold and implement `meetxt transcribe <audio-file>`.
+Project readiness is complete; product implementation has not started. The first product task may create the real Ruby CLI scaffold and implement `meetxt transcribe <audio-file>`.
 
 ## First useful version
 

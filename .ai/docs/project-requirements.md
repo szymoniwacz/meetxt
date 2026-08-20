@@ -212,21 +212,21 @@ Consider recording, Linux, output overrides, unique naming, alternate providers,
 
 ## Project readiness
 
-Documentation-oriented bootstrap customization is prepared for human review. Product behavior and the Ruby application scaffold remain unimplemented.
+Documentation-oriented bootstrap customization was reviewed and merged in PR #4. Product behavior and the Ruby application scaffold remain unimplemented.
 
-The current bootstrap exposed a workflow mismatch for greenfield repositories: the checklist expects real setup/test/lint/build commands before the first product scaffold exists. Those commands are therefore deferred rather than fabricated. The workflow contract should be adjusted separately so a greenfield project can become ready for its first scaffold-producing goal without creating throwaway bootstrap code.
+The greenfield workflow blocker is resolved: the bootstrap contract now explicitly allows unavailable project commands to be deferred to the first scaffold-producing product goal. MeetXT uses that path rather than creating throwaway packaging or placeholder commands.
 
 | Check | Result | Notes |
 |---|---|---|
 | Definition coverage complete | yes | All contract areas explicitly classified |
 | No `blocking-question` remains | yes | Deferred details have return triggers |
 | All `deferred` items have reason and return trigger | yes | Model before implementation; commands with first product scaffold; publishing at first release |
-| Template customization complete | partial | Product README, repository adapter, and stack guidance are customized; technical scaffold intentionally deferred |
+| Template customization complete | yes | Product README, repository adapter, stack guidance, and project context are customized; greenfield rules permit the technical scaffold to remain deferred |
 | Stack profile selected or marked N/A | yes | `.ai/stack-profiles/ruby-cli.md` |
-| Real project commands recorded | no | Deferred until the first product task creates the actual Ruby CLI scaffold |
+| Real project commands recorded | deferred | No scaffold exists, so commands are unavailable; the first scaffold-producing product goal owns recording setup, run, test, lint, build, any applicable typecheck, and applicable CI commands before handoff |
 | Root README describes the product | yes | README identifies MeetXT, scope, planned interface, limitations, context, license, and maintainer |
 | `AGENTS.md` describes repository role | yes | Adapter identifies the MeetXT repository and product-work boundaries |
 | Bootstrap markers removed | yes | Repository scan found no remaining bootstrap replacement marker in project-owned documentation |
 | License and ownership decided | yes | MIT; Szymon Iwacz |
 | CI, branch rules, and approvals decided | yes | Feature PR workflow is decided; Ruby product CI will be established with the scaffold |
-| Project ready for first product task | no | Pending human review and a workflow adjustment for greenfield bootstrap readiness; do not fabricate scaffold solely to pass this gate |
+| Project ready for first product task | yes | All readiness checks pass under the greenfield command-deferral rule; the first product goal must be separately scoped and implementation-ready |
