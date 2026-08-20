@@ -7,9 +7,8 @@ if [[ -z "$ROOT" ]]; then
   exit 1
 fi
 
-old_revision="$(git -C "$ROOT" rev-parse HEAD:.ai-template 2>/dev/null || printf 'unknown')"
+old_revision="$(git -C "$ROOT/.ai-template" rev-parse HEAD 2>/dev/null || printf 'unknown')"
 
-git -C "$ROOT" submodule update --init --remote .ai-template
 "$ROOT/scripts/setup-ai-workflow.sh"
 
 new_revision="$(git -C "$ROOT/.ai-template" rev-parse HEAD 2>/dev/null || printf 'unknown')"

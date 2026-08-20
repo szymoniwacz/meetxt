@@ -10,6 +10,9 @@ project="$tmp_root/project"
 missing_config="$tmp_root/missing-config"
 
 cp -a "$adapter_root/tests/fixtures/fake-ai-project-template" "$fixture_repo"
+mkdir -p "$fixture_repo/.agents/skills/project-intake" "$fixture_repo/.cursor/commands"
+printf '%s\n' '---' 'name: project-intake' 'description: test adapter' '---' > "$fixture_repo/.agents/skills/project-intake/SKILL.md"
+printf '# /execute-goal\n\nDelegate to `.ai/skills/execute-goal.md`.\n' > "$fixture_repo/.cursor/commands/execute-goal.md"
 git -C "$fixture_repo" init -q
 git -C "$fixture_repo" config user.email test@example.com
 git -C "$fixture_repo" config user.name Test
@@ -35,7 +38,6 @@ git -C "$project" commit -qm base
 
 git -C "$project" -c protocol.file.allow=always submodule add -q "$fixture_repo" .ai-template
 git -C "$project" commit -qam 'add submodule'
-pinned_revision="$(git -C "$project" rev-parse HEAD:.ai-template)"
 
 assert_contains() {
   [[ "$1" == *"$2"* ]] || { printf 'Expected output to contain: %s\nActual: %s\n' "$2" "$1" >&2; exit 1; }
@@ -55,18 +57,18 @@ grep -q 'project-owned' "$project/.ai/project/product-context.md"
 
 printf '4. preserves uncommitted overlay edits\n'
 printf '# Product Context\nuncommitted-edit\n' > "$project/.ai/project/product-context.md"
-(cd "$project" && ./scripts/setup-ai-workflow.sh >/dev/null)
+(cd "$project" && GIT_ALLOW_PROTOCOL=file ./scripts/setup-ai-workflow.sh >/dev/null)
 grep -q 'uncommitted-edit' "$project/.ai/project/product-context.md"
 git -C "$project" checkout -- .ai/project/product-context.md
 
 printf '5. removes stale template-owned files\n'
 printf 'stale\n' > "$project/.ai/stale-private.md"
-(cd "$project" && ./scripts/setup-ai-workflow.sh >/dev/null)
+(cd "$project" && GIT_ALLOW_PROTOCOL=file ./scripts/setup-ai-workflow.sh >/dev/null)
 [[ ! -e "$project/.ai/stale-private.md" ]]
 
 printf '6. repeated setup is idempotent\n'
-first="$(cd "$project" && ./scripts/setup-ai-workflow.sh)"
-second="$(cd "$project" && ./scripts/setup-ai-workflow.sh)"
+first="$(cd "$project" && GIT_ALLOW_PROTOCOL=file ./scripts/setup-ai-workflow.sh)"
+second="$(cd "$project" && GIT_ALLOW_PROTOCOL=file ./scripts/setup-ai-workflow.sh)"
 assert_contains "$first" 'AI workflow ready'
 assert_contains "$second" 'AI workflow ready'
 
@@ -93,7 +95,7 @@ assert_contains "$doctor_output" 'Status: ready'
 
 printf '11. setup works from nested directory\n'
 mkdir -p "$project/nested/deeper"
-(cd "$project/nested/deeper" && ../../scripts/setup-ai-workflow.sh >/dev/null)
+(cd "$project/nested/deeper" && GIT_ALLOW_PROTOCOL=file ../../scripts/setup-ai-workflow.sh >/dev/null)
 
 printf '12. missing submodule configuration fails closed\n'
 mkdir -p "$missing_config/scripts"
@@ -106,9 +108,15 @@ set -e
 [[ "$missing_status" -ne 0 ]]
 assert_contains "$missing_output" '.gitmodules is missing'
 
-printf '13. target pins the exact private workflow revision\n'
+printf '13. setup updates the private workflow from the configured remote\n'
+printf 'updated\n' > "$fixture_repo/.ai/updated-by-setup.md"
+git -C "$fixture_repo" add .ai/updated-by-setup.md
+git -C "$fixture_repo" commit -qm 'update workflow'
+latest_revision="$(git -C "$fixture_repo" rev-parse HEAD)"
+(cd "$project" && GIT_ALLOW_PROTOCOL=file ./scripts/setup-ai-workflow.sh >/dev/null)
 checked_out_revision="$(git -C "$project/.ai-template" rev-parse HEAD)"
-[[ "$pinned_revision" == "$checked_out_revision" ]]
+[[ "$latest_revision" == "$checked_out_revision" ]]
+[[ -f "$project/.ai/updated-by-setup.md" ]]
 
 printf '14. legitimate adapter filenames do not trigger leak detection\n'
 mkdir -p "$project/.cursor/rules"
@@ -127,5 +135,10 @@ copied_status=$?
 set -e
 [[ "$copied_status" -ne 0 ]]
 assert_contains "$copied_output" 'copied private ai-project-template repository is tracked'
+
+printf '16. setup materializes Codex and Cursor adapters\n'
+[[ -f "$project/.agents/skills/project-intake/SKILL.md" ]]
+[[ -f "$project/.cursor/commands/execute-goal.md" ]]
+[[ -z "$(git -C "$project" status --porcelain -- .agents/skills .cursor/commands)" ]]
 
 printf 'All adapter contract tests passed.\n'
