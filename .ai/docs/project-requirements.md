@@ -123,18 +123,18 @@ The first version succeeds when `meetxt transcribe meeting.mp3` reliably produce
 
 ## Active stack profile
 
-No existing profile exactly fits a Ruby CLI. Selection or creation during bootstrap blocks readiness, not definition coverage.
-
 | Active profile | Applies to | Notes |
 |---|---|---|
-| Not yet selected | Ruby 3.3 CLI/gem | Do not substitute the Rails profile; resolve during bootstrap |
+| `.ai/stack-profiles/ruby-cli.md` | Ruby 3.3 CLI/gem | Project-owned profile; Rails guidance is not active |
+
+Real project commands are intentionally deferred until the first product task creates the actual Ruby CLI scaffold. Bootstrap must not invent placeholder setup, test, lint, build, or run commands solely to satisfy the readiness checklist.
 
 ## Quality requirements
 
 - Unit tests for core services/rendering; mocked provider-adapter tests; CLI success/major-error integration tests.
 - Cover overwrite protection and atomic writes.
 - No paid OpenAI calls in CI; optional manual real-provider smoke test.
-- RuboCop and GitHub Actions required before merge.
+- RuboCop and GitHub Actions required before merge once the Ruby scaffold exists.
 
 ## Security and privacy requirements
 
@@ -166,7 +166,7 @@ No existing profile exactly fits a Ruby CLI. Selection or creation during bootst
 ## Open questions
 
 - [ ] Exact OpenAI model/response format: resolve during technical planning before implementation-ready.
-- [ ] Ruby CLI stack profile and real commands: resolve during template customization.
+- [ ] Real project commands and packaging details: establish with the first product scaffold rather than during documentation-only bootstrap.
 - [ ] Manual RubyGems publication/rollback: resolve when preparing the first release.
 
 These are deferred with explicit return triggers and do not block definition coverage.
@@ -207,24 +207,26 @@ Consider recording, Linux, output overrides, unique naming, alternate providers,
 | Supported platforms and compatibility | decided | Ruby 3.3/macOS; MP3/M4A/WAV; portability favored | Constraints; FR-002 |
 | Accessibility and localization | not-applicable | English terminal/docs; readable output; spoken language auto-detected | Confirmed intake; FR-006 |
 | Compliance, backup, and recovery | not-applicable | User owns consent/legal duties and local backup/recovery | Privacy requirements; confirmed intake |
-| Branching, CI, release, and rollback | decided | Feature PRs to `main`, required GitHub Actions, manual revert/yank, release details deferred until first release | Decisions; Quality requirements |
+| Branching, CI, release, and rollback | decided | Feature PRs to `main`, GitHub Actions once product scaffold exists, manual revert/yank, release details deferred until first release | Decisions; Quality requirements |
 | License, ownership, and documentation expectations | decided | MIT; maintained by Szymon Iwacz; upload/legal docs required | Decisions; Privacy requirements |
 
 ## Project readiness
 
-Readiness was not approved by intake. Complete `.ai/onboarding/bootstrap-checklist.md`; do not implement until the final row is confirmed.
+Documentation-oriented bootstrap customization is prepared for human review. Product behavior and the Ruby application scaffold remain unimplemented.
+
+The current bootstrap exposed a workflow mismatch for greenfield repositories: the checklist expects real setup/test/lint/build commands before the first product scaffold exists. Those commands are therefore deferred rather than fabricated. The workflow contract should be adjusted separately so a greenfield project can become ready for its first scaffold-producing goal without creating throwaway bootstrap code.
 
 | Check | Result | Notes |
 |---|---|---|
 | Definition coverage complete | yes | All contract areas explicitly classified |
 | No `blocking-question` remains | yes | Deferred details have return triggers |
-| All `deferred` items have reason and return trigger | yes | Model before implementation; stack/commands at bootstrap; publishing at first release |
-| Template customization complete | not assessed | Bootstrap not run |
-| Stack profile selected or marked N/A | no | Ruby CLI profile unresolved |
-| Real project commands recorded | no | Establish from actual scaffold |
-| Root README describes the product | not assessed | Bootstrap not run |
-| `AGENTS.md` describes repository role | not assessed | Bootstrap not run |
-| Bootstrap markers removed | not assessed | Bootstrap not run |
+| All `deferred` items have reason and return trigger | yes | Model before implementation; commands with first product scaffold; publishing at first release |
+| Template customization complete | partial | Product README, repository adapter, and stack guidance are customized; technical scaffold intentionally deferred |
+| Stack profile selected or marked N/A | yes | `.ai/stack-profiles/ruby-cli.md` |
+| Real project commands recorded | no | Deferred until the first product task creates the actual Ruby CLI scaffold |
+| Root README describes the product | yes | README identifies MeetXT, scope, planned interface, limitations, context, license, and maintainer |
+| `AGENTS.md` describes repository role | yes | Adapter identifies the MeetXT repository and product-work boundaries |
+| Bootstrap markers removed | yes | Repository scan found no remaining bootstrap replacement marker in project-owned documentation |
 | License and ownership decided | yes | MIT; Szymon Iwacz |
-| CI, branch rules, and approvals decided | yes | GitHub Actions required for PRs to `main` |
-| Project ready for first product task | no | Customization/readiness checks remain |
+| CI, branch rules, and approvals decided | yes | Feature PR workflow is decided; Ruby product CI will be established with the scaffold |
+| Project ready for first product task | no | Pending human review and a workflow adjustment for greenfield bootstrap readiness; do not fabricate scaffold solely to pass this gate |
