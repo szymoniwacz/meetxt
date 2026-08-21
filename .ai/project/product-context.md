@@ -11,7 +11,7 @@
 
 - Main stack: Ruby 3.3 gem with a `meetxt` executable.
 - Tooling: Bundler, RSpec, RuboCop, and GitHub Actions.
-- Commands: Establish real setup, run, test, lint, build, and any applicable typecheck commands when the first product goal creates the Ruby CLI scaffold.
+- Commands: `bundle install`; run with `bundle exec exe/meetxt`; test with `bundle exec rspec`; lint with `bundle exec rubocop`; build with `gem build meetxt.gemspec`. Typecheck is not applicable for the MVP.
 - Boundary: CLI → transcription service → OpenAI adapter → Markdown renderer → atomic file writer.
 
 ## Constraints

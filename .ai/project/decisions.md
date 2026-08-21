@@ -9,7 +9,8 @@
 
 ### 2026-08-20 — OpenAI provider boundary
 
-- Use OpenAI via `OPENAI_API_KEY` and one sensible model selected in code.
+- Use OpenAI via `OPENAI_API_KEY`.
+- For the MVP, use `whisper-1` with `response_format: verbose_json` and segment timestamps.
 - Prefer the official Ruby SDK when compatible with a small adapter.
 - Make one request per input/execution unless provider-required; do not retry automatically.
 - Do not build a speculative generic provider framework.

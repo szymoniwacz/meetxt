@@ -1,0 +1,24 @@
+AllCops:
+  CacheRootDirectory: tmp/rubocop_cache
+  NewCops: enable
+  SuggestExtensions: false
+  TargetRubyVersion: 3.3
+
+Metrics/BlockLength:
+  Exclude:
+    - "spec/**/*"
+
+Metrics/AbcSize:
+  Max: 25
+
+Metrics/MethodLength:
+  Max: 20
+
+Metrics/CyclomaticComplexity:
+  Max: 8
+
+Style/Documentation:
+  Enabled: false
+
+Style/StringLiterals:
+  EnforcedStyle: double_quotes
