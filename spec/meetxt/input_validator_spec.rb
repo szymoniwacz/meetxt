@@ -10,6 +10,12 @@ RSpec.describe Meetxt::InputValidator do
     end
   end
 
+  it "accepts a real WAV fixture" do
+    path = Pathname(__dir__).join("../fixtures/audio/reported_speech.wav").expand_path
+
+    expect(validator.validate!(path)).to eq(path)
+  end
+
   it "accepts supported audio formats case-insensitively" do
     path = @directory.join("meeting.MP3")
     path.binwrite("audio")
