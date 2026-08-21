@@ -38,10 +38,12 @@ module Meetxt
       private
 
       def build_transcript(response)
-        segments = Array(response.segments).map { |segment| Segment.new(start: segment.start, text: segment.text) }
+        segments = Array(response[:segments]).map do |segment|
+          Segment.new(start: segment[:start], text: segment[:text])
+        end
         raise ProviderError, "Provider response did not include timestamped transcript segments." if segments.empty?
 
-        Transcript.new(provider: PROVIDER, model: MODEL, segments: segments, duration: response.duration)
+        Transcript.new(provider: PROVIDER, model: MODEL, segments: segments, duration: response[:duration])
       end
     end
   end

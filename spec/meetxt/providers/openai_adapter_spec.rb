@@ -8,14 +8,20 @@ RSpec.describe Meetxt::Providers::OpenAIAdapter do
   let(:client) { instance_double(OpenAI::Client, audio:) }
   let(:adapter) { described_class.new(api_key: "unused-test-key", client:) }
   let(:path) { Pathname("meeting.mp3") }
-  let(:segment_response_class) { Data.define(:start, :text) }
-  let(:transcription_response_class) { Data.define(:segments, :duration) }
+
+  def sdk_response(payload)
+    OpenAI::Internal::Type::Converter.coerce(OpenAI::Audio::TranscriptionCreateResponse, payload)
+  end
 
   it "requests verbose segment timestamps exactly once and maps the response" do
-    response = transcription_response_class.new(
-      segments: [segment_response_class.new(start: 12.8, text: "Hello")],
-      duration: 42.5
+    response = sdk_response(
+      text: "Hello",
+      language: "english",
+      duration: 42.5,
+      segments: [{ start: 12.8, end: 14.2, text: "Hello" }]
     )
+    expect(response).to be_a(OpenAI::Audio::Transcription)
+    expect(response).not_to respond_to(:segments)
     expect(transcriptions).to receive(:create).once.with(
       file: path,
       model: "whisper-1",
@@ -31,6 +37,20 @@ RSpec.describe Meetxt::Providers::OpenAIAdapter do
     expect(transcript.segments.first).to have_attributes(start: 12.8, text: "Hello")
   end
 
+  it "serializes the verbose response format and bracketed timestamp array for multipart upload" do
+    params, = OpenAI::Audio::TranscriptionCreateParams.dump_request(
+      file: StringIO.new("audio"),
+      model: "whisper-1",
+      response_format: :verbose_json,
+      timestamp_granularities: [:segment]
+    )
+    _, body = OpenAI::Internal::Util.encode_content({ "content-type" => "multipart/form-data" }, params)
+    multipart = body.to_a.join
+
+    expect(multipart).to match(/name="response_format".*?\r\n\r\nverbose_json\r\n/m)
+    expect(multipart).to match(/name="timestamp_granularities\[\]".*?\r\n\r\nsegment\r\n/m)
+  end
+
   it "disables SDK retries and logging on the default client" do
     expect(OpenAI::Client).to receive(:new).with(
       api_key: "test-key",
@@ -42,7 +62,7 @@ RSpec.describe Meetxt::Providers::OpenAIAdapter do
   end
 
   it "rejects a response without timestamped segments" do
-    response = transcription_response_class.new(segments: [], duration: nil)
+    response = sdk_response(text: "Hello")
     allow(transcriptions).to receive(:create).and_return(response)
 
     expect { adapter.transcribe(path) }
