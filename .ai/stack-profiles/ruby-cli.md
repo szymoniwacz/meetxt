@@ -8,17 +8,24 @@ Stack-specific guidance for MeetXT. Global workflow rules still apply.
 - Package MeetXT as a Ruby gem.
 - Use Bundler for dependency management.
 - Prefer standard Ruby libraries and minimal runtime dependencies.
-- Do not create packaging files or executable stubs during documentation-only bootstrap; create the real scaffold with the first product task.
+- Keep packaging and executable files limited to what the implemented CLI requires.
 
 ## Project commands
 
-No project setup, test, lint, build, or run commands are recorded yet because the Ruby application scaffold does not exist.
+```bash
+bundle install
+bundle exec exe/meetxt transcribe meeting.mp3
+bundle exec rspec
+bundle exec rubocop
+bundle exec rake
+gem build meetxt.gemspec
+```
 
-Record the real commands when the first product task creates the scaffold. Do not invent placeholder commands solely to satisfy readiness documentation.
+Static typechecking is not applicable to the MVP.
 
 ## Expected structure
 
-The first product task should establish only the structure it actually needs, following these responsibility boundaries:
+The implemented first product slice uses these responsibility boundaries:
 
 - CLI
 - transcription service

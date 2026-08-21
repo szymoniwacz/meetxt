@@ -127,7 +127,17 @@ The first version succeeds when `meetxt transcribe meeting.mp3` reliably produce
 |---|---|---|
 | `.ai/stack-profiles/ruby-cli.md` | Ruby 3.3 CLI/gem | Project-owned profile; Rails guidance is not active |
 
-Real project commands are intentionally deferred until the first product task creates the actual Ruby CLI scaffold. Bootstrap must not invent placeholder setup, test, lint, build, or run commands solely to satisfy the readiness checklist.
+Real project commands now provided by the Ruby CLI scaffold:
+
+| Purpose | Command |
+|---|---|
+| Setup | `bundle install` |
+| Run from repository | `bundle exec exe/meetxt transcribe meeting.mp3` |
+| Test | `bundle exec rspec` |
+| Lint | `bundle exec rubocop` |
+| Test and lint | `bundle exec rake` |
+| Build gem | `gem build meetxt.gemspec` |
+| Typecheck | Not applicable; static typing is out of scope for the MVP |
 
 ## Quality requirements
 
@@ -151,7 +161,7 @@ Real project commands are intentionally deferred until the first product task cr
 | Upload succeeds, write fails | Cost without saved transcript | Validate first, atomic write, clear error, no retry |
 | Sensitive error leakage | Privacy/credential exposure | Sanitization rules and tests |
 | Provider rejects large/long input | Meeting fails after upload begins | Clear provider error; document dependency |
-| Timestamp response differs | Acceptance format unavailable | Choose timestamp-capable model/response before implementation |
+| Timestamp response differs | Acceptance format unavailable | Pin `whisper-1` verbose JSON segment behavior behind mapped-response tests |
 | macOS coupling | Linux work becomes costly | Prefer portable Ruby behavior |
 
 ## Assumptions
@@ -161,12 +171,10 @@ Real project commands are intentionally deferred until the first product task cr
 | User owns retention, backup, and deletion of local audio/transcripts. | No application data lifecycle exists. | Bootstrap documentation review |
 | MeetXT has no telemetry or persistent app log. | Preserves privacy and MVP simplicity. | First implementation plan |
 | Provider segments supply useful timing. | Timestamps are mandatory. | SDK investigation and smoke test |
-| Exact default model is chosen from currently supported timestamp-capable models. | Availability may change; user does not configure it. | Resolve before implementation-ready and record decision |
+| A later model change preserves the provider adapter contract. | The MVP deliberately uses `whisper-1`, but newer models may become suitable. | Re-evaluate only when replacing the provider implementation |
 
 ## Open questions
 
-- [ ] Exact OpenAI model/response format: resolve during technical planning before implementation-ready.
-- [ ] Real project commands and packaging details: establish with the first product scaffold rather than during documentation-only bootstrap.
 - [ ] Manual RubyGems publication/rollback: resolve when preparing the first release.
 
 These are deferred with explicit return triggers and do not block definition coverage.
@@ -200,7 +208,7 @@ Consider recording, Linux, output overrides, unique naming, alternate providers,
 | Secrets, privacy, and sensitive data | decided | Redaction, no content/raw bodies, upload disclosure | Privacy requirements |
 | Language, framework, and dependencies | decided | Ruby 3.3 gem, Bundler/RSpec/RuboCop, minimal deps, no typing | Technical preferences; decisions |
 | Environments and deployment | not-applicable | Local CLI; no staging/production | Confirmed intake |
-| Configuration | decided | `OPENAI_API_KEY`; fixed model; auto language | FR-004/006 |
+| Configuration | decided | `OPENAI_API_KEY`; `whisper-1` with `verbose_json` segment timestamps; auto language | FR-004/006; `.ai/project/decisions.md` |
 | Logging, monitoring, and errors | decided | Quiet stdout; sanitized stderr; no telemetry/log assumed | FR-014/015; assumptions |
 | Tests, lint, typecheck, performance | decided | RSpec, RuboCop, mocked CI, manual smoke, no typing/SLA | Quality requirements |
 | Scale, reliability, and cost | decided | ~2-hour meetings, one call/input/execution, atomic output, no retry | Constraints; FR-005/010 |
@@ -212,7 +220,7 @@ Consider recording, Linux, output overrides, unique naming, alternate providers,
 
 ## Project readiness
 
-Documentation-oriented bootstrap customization was reviewed and merged in PR #4. Product behavior and the Ruby application scaffold remain unimplemented.
+Documentation-oriented bootstrap customization was reviewed and merged in PR #4. The first product branch now supplies the Ruby application scaffold and real project commands; its behavior remains subject to PR review and CI before merge.
 
 The greenfield workflow blocker is resolved: the bootstrap contract now explicitly allows unavailable project commands to be deferred to the first scaffold-producing product goal. MeetXT uses that path rather than creating throwaway packaging or placeholder commands.
 
@@ -220,13 +228,13 @@ The greenfield workflow blocker is resolved: the bootstrap contract now explicit
 |---|---|---|
 | Definition coverage complete | yes | All contract areas explicitly classified |
 | No `blocking-question` remains | yes | Deferred details have return triggers |
-| All `deferred` items have reason and return trigger | yes | Model before implementation; commands with first product scaffold; publishing at first release |
-| Template customization complete | yes | Product README, repository adapter, stack guidance, and project context are customized; greenfield rules permit the technical scaffold to remain deferred |
+| All `deferred` items have reason and return trigger | yes | Manual publishing remains deferred until the first release |
+| Template customization complete | yes | Product README, repository adapter, stack guidance, and project context are customized; the greenfield deferral ended when this scaffold supplied real commands |
 | Stack profile selected or marked N/A | yes | `.ai/stack-profiles/ruby-cli.md` |
-| Real project commands recorded | deferred | No scaffold exists, so commands are unavailable; the first scaffold-producing product goal owns recording setup, run, test, lint, build, any applicable typecheck, and applicable CI commands before handoff |
+| Real project commands recorded | yes | Setup, repository run, test, lint, combined quality, and gem build commands are recorded above; typecheck is not applicable |
 | Root README describes the product | yes | README identifies MeetXT, scope, planned interface, limitations, context, license, and maintainer |
 | `AGENTS.md` describes repository role | yes | Adapter identifies the MeetXT repository and product-work boundaries |
 | Bootstrap markers removed | yes | Repository scan found no remaining bootstrap replacement marker in project-owned documentation |
 | License and ownership decided | yes | MIT; Szymon Iwacz |
-| CI, branch rules, and approvals decided | yes | Feature PR workflow is decided; Ruby product CI will be established with the scaffold |
-| Project ready for first product task | yes | All readiness checks pass under the greenfield command-deferral rule; the first product goal must be separately scoped and implementation-ready |
+| CI, branch rules, and approvals decided | yes | Feature PR workflow is decided; Ruby product CI runs test, lint, and gem build gates |
+| Project ready for product work | yes | Bootstrap checks pass and the first scoped product goal now provides the real scaffold and commands |

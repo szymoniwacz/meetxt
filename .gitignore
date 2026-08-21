@@ -23,3 +23,9 @@
 .env
 .env.*
 !.env.example
+
+# Ruby development and packaging output.
+/.bundle/
+/vendor/bundle/
+/*.gem
+/tmp/

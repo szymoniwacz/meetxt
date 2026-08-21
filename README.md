@@ -1,34 +1,59 @@
 # MeetXT
 
-MeetXT is a planned local-first Ruby CLI for developers and technical professionals who want to turn meeting recordings into readable, timestamped Markdown transcripts.
+MeetXT is a local-first Ruby CLI for developers and technical professionals who want to turn meeting recordings into readable, timestamped Markdown transcripts.
 
 ## Status
 
-Project readiness is complete; product implementation has not started. The first product task may create the real Ruby CLI scaffold and implement `meetxt transcribe <audio-file>`.
+The first usable CLI slice is implemented for file-based transcription on macOS.
 
 ## First useful version
 
-The initial CLI will accept local MP3, M4A, and WAV recordings on macOS, transcribe audio through OpenAI using `OPENAI_API_KEY`, and write UTF-8 Markdown beside the source file without overwriting existing output. It will include provider-supported `[HH:MM:SS]` timestamps and privacy-safe errors.
+The initial CLI accepts local MP3, M4A, and WAV recordings on macOS, transcribes audio through OpenAI using `OPENAI_API_KEY`, and writes UTF-8 Markdown beside the source file without overwriting existing output. It includes provider-supported `[HH:MM:SS]` timestamps and privacy-safe errors.
 
-Audio will be uploaded to the configured external transcription provider. Users are responsible for permission to record and upload meeting audio and for applicable confidentiality, privacy, and legal requirements.
+Audio is uploaded to the configured external transcription provider. Users are responsible for permission to record and upload meeting audio and for applicable confidentiality, privacy, and legal requirements.
 
-## Planned interface
+## Setup
+
+Install Ruby 3.3 and dependencies:
 
 ```bash
-meetxt transcribe meeting.mp3
+bundle install
 ```
 
-The command does not exist yet. Setup, test, lint, build, and run commands will be recorded when the first product task creates the actual Ruby CLI scaffold.
+## Usage
+
+From the repository:
+
+```bash
+bundle exec exe/meetxt transcribe meeting.mp3
+```
+
+After installing a built gem, use `meetxt transcribe meeting.mp3`. The transcript is written beside the source as `meeting.md`. Existing output is never overwritten.
 
 ## Configuration
 
-The implemented transcription command will require:
+The transcription command requires:
 
 | Variable | Required | Description |
 |---|---|---|
 | `OPENAI_API_KEY` | yes | Credential for the OpenAI transcription provider |
 
 Never commit API keys or meeting recordings.
+
+MeetXT sends the selected audio file to OpenAI using `whisper-1`. You are responsible for permission to record and upload the audio and for applicable confidentiality, privacy, and legal requirements.
+
+## Development
+
+```bash
+bundle exec rspec
+bundle exec rubocop
+bundle exec rake
+gem build meetxt.gemspec
+```
+
+There is no static typecheck for the MVP. Automated tests use provider doubles and never call OpenAI.
+
+For an optional paid smoke test, set `OPENAI_API_KEY` and run the normal command with a non-sensitive audio file. This is manual only and must never run in CI.
 
 ## Project context and workflow
 
@@ -42,7 +67,6 @@ The repository uses a private reusable workflow through the `.ai-template` submo
 
 ## Current limitations
 
-- No product behavior or Ruby application scaffold is implemented yet.
 - The first version targets macOS and existing audio files only.
 - Recording, Linux support, diarization, summaries, integrations, retries, cloud storage, and user accounts are deferred.
 

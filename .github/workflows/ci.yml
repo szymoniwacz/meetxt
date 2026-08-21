@@ -5,6 +5,25 @@ on:
   pull_request:
 
 jobs:
+  ruby-quality:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+          bundler-cache: true
+
+      - name: Test and lint
+        run: bundle exec rake
+
+      - name: Build gem
+        run: gem build meetxt.gemspec
+
   adapter-contract:
     strategy:
       matrix:
