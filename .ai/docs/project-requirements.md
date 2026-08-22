@@ -2,7 +2,7 @@
 
 ## Project summary
 
-MeetXT is a local-first Ruby 3.3 CLI for developers and technical professionals who want searchable, reviewable meeting records without a platform integration or bot. It sends an existing recording to OpenAI and writes a timestamped Markdown transcript locally.
+MeetXT is a local-first Ruby 3.3 CLI for developers and technical professionals who want searchable, reviewable meeting records without a platform integration or bot. It can record the default macOS audio input locally, then separately send that recording to OpenAI and write a timestamped Markdown transcript.
 
 The first version succeeds when `meetxt transcribe meeting.mp3` reliably produces `meeting.md` from a real meeting and reports clear, sanitized errors for configuration, input, network, provider, rate-limit, and file-write failures.
 
@@ -28,7 +28,7 @@ The first version succeeds when `meetxt transcribe meeting.mp3` reliably produce
 
 ## Non-goals
 
-- Recording, GUI/web UI, bots, platform/calendar integrations, diarization, summaries/actions, cloud storage, or accounts.
+- Configurable recording devices, combined record/transcribe, GUI/web UI, bots, platform/calendar integrations, diarization, summaries/actions, cloud storage, or accounts.
 - Configurable model/language, retries, output overrides, unique naming, Linux, static typing, release automation, or a generic provider framework.
 
 ## Core workflows
@@ -50,6 +50,13 @@ The first version succeeds when `meetxt transcribe meeting.mp3` reliably produce
 
 `meetxt --help` and `meetxt --version` succeed. Missing/invalid commands show concise usage and exit nonzero.
 
+### Record a meeting
+
+1. User runs `meetxt record meeting.wav` on macOS with FFmpeg installed and grants microphone access.
+2. MeetXT refuses an existing or non-WAV output, then records the default AVFoundation audio input.
+3. User presses Enter to stop; MeetXT leaves a non-empty WAV and prints its path.
+4. Startup, device, permission, or capture failures are actionable and do not leave a misleading output.
+
 ## Functional requirements
 
 | ID | Requirement | Priority | Notes |
@@ -70,12 +77,17 @@ The first version succeeds when `meetxt transcribe meeting.mp3` reliably produce
 | FR-014 | Distinguish validation, overwrite, auth/config, rate-limit, provider, network, and write errors. | must | Sanitized/actionable |
 | FR-015 | Success: path only on stdout/zero; error: stderr/nonzero conventional code. | must | Quiet normal output |
 | FR-016 | Provide `--help`/`--version`; concise nonzero usage for missing/invalid commands. | must | Standard CLI behavior |
+| FR-017 | Provide `meetxt record <output.wav>` on macOS using local FFmpeg/AVFoundation and the default audio input. | must | Recording remains separate from transcription |
+| FR-018 | Stop recording explicitly with Enter and print only the completed WAV path to stdout. | must | Prompts use stderr |
+| FR-019 | Refuse existing or non-WAV recording output and remove failed or empty captures. | must | No misleading successful output |
+| FR-020 | Report missing FFmpeg, unsupported platform, and audio device/permission failures clearly. | must | No bundled audio tooling or device selection |
 
 ## Data and inputs
 
 | Input | Source | Format | Notes |
 |---|---|---|---|
 | Meeting recording | Local filesystem | MP3, M4A, WAV | Normal meetings up to ~2 hours; provider constraints apply |
+| Live audio input | Default macOS AVFoundation audio device | PCM WAV via FFmpeg | Local-only recording; user stops with Enter |
 | Credential | Environment | `OPENAI_API_KEY` | Required and secret |
 
 ## Outputs
@@ -106,6 +118,7 @@ The first version succeeds when `meetxt transcribe meeting.mp3` reliably produce
 | Integration | Purpose | Required now? | Notes |
 |---|---|---|---|
 | OpenAI transcription API | Timestamped transcription | Yes | Prefer official SDK; adapter; sanitized errors; no retries |
+| FFmpeg with AVFoundation | Local WAV recording | For `record` | User-installed executable on PATH; no runtime gem dependency |
 
 ## Constraints
 

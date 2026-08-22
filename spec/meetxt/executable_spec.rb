@@ -31,6 +31,6 @@ RSpec.describe "meetxt executable" do
 
     expect(status.exitstatus).to eq(64)
     expect(stdout).to be_empty
-    expect(stderr).to eq("Usage: meetxt transcribe <audio-file>\n")
+    expect(stderr).to eq(Meetxt::CLI::USAGE)
   end
 end
