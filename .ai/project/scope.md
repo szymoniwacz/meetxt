@@ -3,6 +3,7 @@
 ## In scope now
 
 - Ruby 3.3 gem/CLI, runnable after installation or from the repository.
+- `meetxt record <output.wav>` using the default macOS audio input through local FFmpeg, stopped explicitly with Enter.
 - `meetxt transcribe <audio-file>` for MP3, M4A, and WAV on macOS.
 - Pre-upload validation of extension, existence, readability, non-empty content, and output collision.
 - One OpenAI transcription request through a small provider adapter.
@@ -13,7 +14,7 @@
 
 ## Out of scope for the first useful version
 
-- Direct recording; GUI/web UI; meeting bots; Zoom, Teams, Meet, or calendar integrations.
+- Configurable recording devices; combined record-and-transcribe; GUI/web UI; meeting bots; Zoom, Teams, Meet, or calendar integrations.
 - Diarization, summaries, action extraction, cloud storage, accounts, or app authentication.
 - Output overrides/unique naming, configurable models/languages, or automatic retries.
 - Linux support, static typing, generalized provider framework, or release automation.

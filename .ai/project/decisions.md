@@ -4,8 +4,15 @@
 
 ### 2026-08-20 — File-based MVP
 
-- Accept existing MP3, M4A, and WAV files on macOS; defer recording.
+- Accept existing MP3, M4A, and WAV files on macOS.
 - Write same-directory Markdown with the source basename; never overwrite.
+
+### 2026-08-22 — Local recording slice
+
+- Add a separate `meetxt record <output.wav>` command; do not transcribe automatically.
+- On macOS, invoke local FFmpeg with AVFoundation and its default audio input to create transcription-compatible PCM WAV.
+- Stop on Enter, print prompts to stderr and only the completed path to stdout, never overwrite, and remove failed or empty captures.
+- Defer configurable devices, other platforms, and bundled audio tooling.
 
 ### 2026-08-20 — OpenAI provider boundary
 

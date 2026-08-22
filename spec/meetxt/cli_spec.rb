@@ -18,6 +18,8 @@ RSpec.describe Meetxt::CLI do
       provider
     end
   end
+  let(:recorder) { instance_double(Meetxt::MacOSRecorder) }
+  let(:recorder_factory) { -> { recorder } }
   let(:transcript) do
     Meetxt::Transcript.new(
       provider: "OpenAI Whisper",
@@ -32,7 +34,9 @@ RSpec.describe Meetxt::CLI do
     source.binwrite("audio")
     allow(provider).to receive(:transcribe).and_return(transcript)
 
-    status = described_class.start(["transcribe", source.to_s], out:, err:, env:, provider_factory:)
+    status = described_class.start(
+      ["transcribe", source.to_s], io: { out:, err: }, env:, factories: { provider: provider_factory }
+    )
 
     expect(status).to eq(0)
     expect(out.string).to eq("#{@directory.join('meeting.md')}\n")
@@ -41,22 +45,50 @@ RSpec.describe Meetxt::CLI do
   end
 
   it "prints help and version" do
-    expect(described_class.start(["--help"], out:, err:, env:)).to eq(0)
-    expect(out.string).to eq("Usage: meetxt transcribe <audio-file>\n")
+    expect(described_class.start(["--help"], io: { out:, err: }, env:)).to eq(0)
+    expect(out.string).to eq(Meetxt::CLI::USAGE)
 
     out.truncate(0)
     out.rewind
-    expect(described_class.start(["--version"], out:, err:, env:)).to eq(0)
+    expect(described_class.start(["--version"], io: { out:, err: }, env:)).to eq(0)
     expect(out.string).to eq("meetxt #{Meetxt::VERSION}\n")
   end
 
   it "shows usage for a missing or invalid command" do
-    expect(described_class.start([], out:, err:, env:)).to eq(64)
-    expect(err.string).to eq("Usage: meetxt transcribe <audio-file>\n")
+    expect(described_class.start([], io: { out:, err: }, env:)).to eq(64)
+    expect(err.string).to eq(Meetxt::CLI::USAGE)
+  end
+
+  it "records audio without requiring OpenAI configuration" do
+    output = @directory.join("meeting.wav")
+    input = StringIO.new("\n")
+    allow(recorder).to receive(:record).with(output.to_s, input:, err:).and_return(output.to_s)
+
+    status = described_class.start(
+      ["record", output.to_s], io: { out:, err:, input: }, env: {}, factories: { recorder: recorder_factory }
+    )
+
+    expect(status).to eq(0)
+    expect(out.string).to eq("#{output}\n")
+    expect(err.string).to be_empty
+  end
+
+  it "reports recording failures without successful output" do
+    allow(recorder).to receive(:record).and_raise(Meetxt::RecordingError, "Recording could not start.")
+
+    status = described_class.start(
+      ["record", "meeting.wav"], io: { out:, err: }, env: {}, factories: { recorder: recorder_factory }
+    )
+
+    expect(status).to eq(69)
+    expect(out.string).to be_empty
+    expect(err.string).to eq("Recording could not start.\n")
   end
 
   it "reports missing configuration without exposing secrets" do
-    status = described_class.start(["transcribe", "meeting.mp3"], out:, err:, env: {}, provider_factory:)
+    status = described_class.start(
+      ["transcribe", "meeting.mp3"], io: { out:, err: }, env: {}, factories: { provider: provider_factory }
+    )
 
     expect(status).to eq(78)
     expect(err.string).to eq("OPENAI_API_KEY is not set.\n")
@@ -67,7 +99,9 @@ RSpec.describe Meetxt::CLI do
     source.binwrite("audio")
     allow(provider).to receive(:transcribe).and_raise(Meetxt::ProviderError, "OpenAI is unavailable.")
 
-    status = described_class.start(["transcribe", source.to_s], out:, err:, env:, provider_factory:)
+    status = described_class.start(
+      ["transcribe", source.to_s], io: { out:, err: }, env:, factories: { provider: provider_factory }
+    )
 
     expect(status).to eq(69)
     expect(out.string).to be_empty
@@ -79,7 +113,9 @@ RSpec.describe Meetxt::CLI do
     source.binwrite("audio")
     allow(provider).to receive(:transcribe)
 
-    status = described_class.start(["transcribe", source.to_s], out:, err:, env:, provider_factory:)
+    status = described_class.start(
+      ["transcribe", source.to_s], io: { out:, err: }, env:, factories: { provider: provider_factory }
+    )
 
     expect(status).to eq(66)
     expect(out.string).to be_empty
@@ -96,7 +132,9 @@ RSpec.describe Meetxt::CLI do
     allow(Meetxt::AtomicWriter).to receive(:new).and_return(writer)
     allow(writer).to receive(:write).and_raise(Meetxt::FileWriteError, output)
 
-    status = described_class.start(["transcribe", source.to_s], out:, err:, env:, provider_factory:)
+    status = described_class.start(
+      ["transcribe", source.to_s], io: { out:, err: }, env:, factories: { provider: provider_factory }
+    )
 
     expect(status).to eq(73)
     expect(out.string).to be_empty
@@ -110,7 +148,9 @@ RSpec.describe Meetxt::CLI do
     output = @directory.join("meeting.md")
     output.write("existing")
 
-    status = described_class.start(["transcribe", source.to_s], out:, err:, env:, provider_factory:)
+    status = described_class.start(
+      ["transcribe", source.to_s], io: { out:, err: }, env:, factories: { provider: provider_factory }
+    )
 
     expect(status).to eq(73)
     expect(err.string).to include("already exists")

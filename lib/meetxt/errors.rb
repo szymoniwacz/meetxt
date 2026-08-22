@@ -34,6 +34,12 @@ module Meetxt
     end
   end
 
+  class RecordingError < Error
+    def initialize(message)
+      super(message, exit_code: 69)
+    end
+  end
+
   class ConfigurationError < Error
     def initialize(message)
       super(message, exit_code: 78)

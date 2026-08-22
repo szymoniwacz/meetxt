@@ -1,10 +1,10 @@
 # MeetXT
 
-MeetXT is a local-first Ruby CLI for developers and technical professionals who want to turn meeting recordings into readable, timestamped Markdown transcripts.
+MeetXT is a local-first Ruby CLI for developers and technical professionals who want to record meeting audio and turn recordings into readable, timestamped Markdown transcripts.
 
 ## Status
 
-The first usable CLI slice is implemented for file-based transcription on macOS.
+File-based transcription and local microphone recording are implemented for macOS.
 
 ## First useful version
 
@@ -20,15 +20,20 @@ Install Ruby 3.3 and dependencies:
 bundle install
 ```
 
+Local recording also requires `ffmpeg` on `PATH` and macOS microphone permission for the terminal application. Verify the dependency with `ffmpeg -version` before recording.
+
 ## Usage
 
 From the repository:
 
 ```bash
+bundle exec exe/meetxt record meeting.wav
 bundle exec exe/meetxt transcribe meeting.mp3
 ```
 
-After installing a built gem, use `meetxt transcribe meeting.mp3`. The transcript is written beside the source as `meeting.md`. Existing output is never overwritten.
+`record` captures the default macOS audio input through FFmpeg. Press Enter to stop; a successful recording prints the completed WAV path. Recording and transcription are deliberately separate, so pass the result to `meetxt transcribe meeting.wav` when ready.
+
+After installing a built gem, omit `bundle exec exe/`. Transcripts are written beside the source as Markdown. Existing recordings and transcripts are never overwritten.
 
 ## Configuration
 
@@ -40,7 +45,7 @@ The transcription command requires:
 
 Never commit API keys or meeting recordings.
 
-MeetXT sends the selected audio file to OpenAI using `whisper-1`. You are responsible for permission to record and upload the audio and for applicable confidentiality, privacy, and legal requirements.
+MeetXT sends the selected audio file to OpenAI using `whisper-1`. You are responsible for permission to record and upload the audio and for applicable confidentiality, privacy, and legal requirements. MeetXT records the default audio input selected by FFmpeg; device selection is not configurable in this slice.
 
 ## Development
 
@@ -67,8 +72,8 @@ The repository uses a private reusable workflow through the `.ai-template` submo
 
 ## Current limitations
 
-- The first version targets macOS and existing audio files only.
-- Recording, Linux support, diarization, summaries, integrations, retries, cloud storage, and user accounts are deferred.
+- Recording targets the default macOS audio input and requires FFmpeg; custom device selection is deferred.
+- Linux support, diarization, summaries, integrations, retries, cloud storage, and user accounts are deferred.
 
 ## License and maintainer
 
