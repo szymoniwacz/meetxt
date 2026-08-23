@@ -35,6 +35,9 @@ required=(
   ".agents/skills/project-intake/SKILL.md"
   ".cursor/commands/execute-goal.md"
   ".gitlab/issue_templates/Agent Goal.md"
+  ".github/ISSUE_TEMPLATE/agent-goal.yml"
+  ".github/ISSUE_TEMPLATE/project-execution.yml"
+  ".github/ISSUE_TEMPLATE/config.yml"
 )
 for path in "${required[@]}"; do
   if [[ ! -f "$TEMPLATE/$path" ]]; then
@@ -64,6 +67,9 @@ done
 
 mkdir -p "$ROOT/.gitlab/issue_templates"
 rsync -a --delete "$TEMPLATE/.gitlab/issue_templates/" "$ROOT/.gitlab/issue_templates/"
+
+mkdir -p "$ROOT/.github/ISSUE_TEMPLATE"
+rsync -a --delete "$TEMPLATE/.github/ISSUE_TEMPLATE/" "$ROOT/.github/ISSUE_TEMPLATE/"
 
 if [[ -d "$OVERLAY/.ai" ]]; then
   rsync -a "$OVERLAY/.ai/" "$AI/"
