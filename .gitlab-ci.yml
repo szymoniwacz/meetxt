@@ -1,0 +1,28 @@
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS
+      when: never
+    - if: $CI_COMMIT_BRANCH
+
+ruby-quality:
+  image: ruby:3.3
+  before_script:
+    - bundle install
+  script:
+    - bundle exec rake
+    - gem build meetxt.gemspec
+
+adapter-contract:
+  image: ruby:3.3
+  before_script:
+    - apt-get update && apt-get install --yes --no-install-recommends rsync
+  script:
+    - test "$(git ls-files --stage scripts/setup-ai-workflow.sh | awk '{print $1}')" = "100755"
+    - test "$(git ls-files --stage scripts/check-workflow-leak.sh | awk '{print $1}')" = "100755"
+    - test "$(git ls-files --stage scripts/ai-workflow-doctor.sh | awk '{print $1}')" = "100755"
+    - test "$(git ls-files --stage scripts/update-ai-workflow.sh | awk '{print $1}')" = "100755"
+    - test "$(git ls-files --stage tests/test-adapter.sh | awk '{print $1}')" = "100755"
+    - bash -n scripts/*.sh tests/test-adapter.sh
+    - bash tests/test-adapter.sh
+    - bash scripts/check-workflow-leak.sh
